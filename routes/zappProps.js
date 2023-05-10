@@ -20,9 +20,19 @@ router.post('/getProps', function(req, res, next) {
 
   const response = [];
 
-  propFileFolder = './config_templates/' + req.body.folder + '/'
-  if (process.platform === 'win32') propFileFolder = propFileFolder.replaceAll('/','\\')
+  propFileFolder = '../' + req.body.folder + '/'
+  if (process.platform === 'win32') propFileFolder = propFileFolder.replaceAll('/','\\');
 
+  if (!fs.existsSync(propFileFolder)) {
+    copyFolders();
+  }
+  
+  if (req.body.properties.length != 0) {
+    dir = "../" + req.body.properties[0].reqType;
+    if (process.platform === 'win32') dir = dir.replaceAll('/','\\');
+    writeFiles(dir,req.body.properties);
+  }
+  
   req.body.languages.forEach ( language => {
     if (language.name == 'Cobol') {
       cobol = language.completed; 
@@ -61,7 +71,7 @@ router.post('/getProps', function(req, res, next) {
       transfer = other.completed; 
     }
   })
-
+  
   fs.readdir(propFileFolder, (err, files) => {
     files.forEach(file => {
       if (file.search(".properties") == -1) {
@@ -113,20 +123,55 @@ router.post('/getProps', function(req, res, next) {
 
 /* Write properties listing. */
 router.post('/writeProps', function(req, res, next) {
-  if (!fs.existsSync("../" + req.body[0].reqType)) {
-    fs.mkdirSync("../" + req.body[0].reqType);
+  var dir = "../" + req.body[0].reqType;
+  if (process.platform === 'win32') dir = dir.replaceAll('/','\\');
+  writeFiles(dir,req.body);
+
+  zipfile = dir + ".zip"
+  zipper.sync.zip(dir).compress().save(zipfile);
+  res.status(200).download(zipfile);
+});
+
+router.get('/resetProps', function(req, res, next) {
+  copyFolders();
+  res.status(200).send({'resp' : 'Reset Complete!!!'});
+});
+
+function copyFolders(){
+  buildConfSrc = './config_templates/build-conf/';
+  buildConfTgt = '../build-conf/';
+  appConfSrc = './config_templates/application-conf/';
+  appConfTgt = '../application-conf/';
+  if (process.platform === 'win32') {
+    buildConfSrc = buildConfSrc.replaceAll('/','\\');
+    buildConfTgt = buildConfTgt.replaceAll('/','\\');
+    appConfSrc = appConfSrc.replaceAll('/','\\');
+    appConfTgt = appConfTgt.replaceAll('/','\\');
+  };
+  fs.rmSync(buildConfTgt, { recursive: true, force: true });
+  fs.rmSync(appConfTgt, { recursive: true, force: true });
+  
+  fs.cpSync(buildConfSrc, buildConfTgt, {recursive: true});
+  fs.cpSync(appConfSrc, appConfTgt, {recursive: true});
+};
+
+function writeFiles(dir,data){
+
+  fs.rmSync(dir, { recursive: true, force: true });
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
   }
-  req.body.forEach(file => {
+  var datatmp = '';
+  data.forEach(file => {
     datatmp = ''
     file.properties.forEach(property => {
        datatmp = datatmp + '# ' + property.comment + '\n';
        datatmp = datatmp + property.prop + '=' + property.value + '\n\n';
     });
-    fs.writeFileSync('../' + file.reqType + '/' + file.filename, datatmp);
-  })
-  zipfile = "../" + req.body[0].reqType + ".zip"
-  zipper.sync.zip("../" + req.body[0].reqType).compress().save(zipfile);
-  res.status(200).download(zipfile);
-});
+    if (process.platform === 'win32') fs.writeFileSync('..\\' + file.reqType + '\\' + file.filename, datatmp);
+    else fs.writeFileSync('../' + file.reqType + '/' + file.filename, datatmp);
+  });
+
+};
 
 module.exports = router;
