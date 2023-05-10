@@ -157,10 +157,10 @@ function copyFolders(){
 
 function writeFiles(dir,data){
 
-  fs.rmSync(dir, { recursive: true, force: true });
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
+  // fs.rmSync(dir, { recursive: true, force: true });
+  // if (!fs.existsSync(dir)) {
+  //   fs.mkdirSync(dir);
+  // }
   var datatmp = '';
   data.forEach(file => {
     datatmp = ''
