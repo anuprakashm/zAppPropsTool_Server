@@ -15,6 +15,7 @@ router.post('/getProps', function(req, res, next) {
   var ims = '';
   var cics = '';
   var imsdc = '';
+  var mq = '';
   var zunit = '';
   var transfer = '';
 
@@ -46,7 +47,7 @@ router.post('/getProps', function(req, res, next) {
     if (language.name == 'REXX') {
       rexx = language.completed; 
     } 
-  })
+  });
 
   req.body.databases.forEach ( database => {
     if (database.name == 'DB2') {
@@ -55,22 +56,28 @@ router.post('/getProps', function(req, res, next) {
     if (database.name == 'IMS') {
       ims = database.completed; 
     } 
-  })
+  });
+
+  req.body.subsystems.forEach ( subsystem => {
+    if (subsystem.name == 'CICS') {
+      cics = subsystem.completed; 
+    } 
+    if (subsystem.name == 'IMS DC') {
+      imsdc = subsystem.completed; 
+    } 
+    if (subsystem.name == 'MQ') {
+      mq = subsystem.completed; 
+    } 
+  });
 
   req.body.others.forEach ( other => {
-    if (other.name == 'CICS') {
-      cics = other.completed; 
-    } 
-    if (other.name == 'IMS DC') {
-      imsdc = other.completed; 
-    } 
     if (other.name == 'ZUnit') {
       zunit = other.completed; 
     }
     if (other.name == 'Transfer Files') {
       transfer = other.completed; 
     }
-  })
+  });
   
   fs.readdir(propFileFolder, (err, files) => {
     files.forEach(file => {
