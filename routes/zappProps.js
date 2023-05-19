@@ -188,16 +188,11 @@ function copyFolders(){
 };
 
 function writeFiles(dir,data){
-
-  // fs.rmSync(dir, { recursive: true, force: true });
-  // if (!fs.existsSync(dir)) {
-  //   fs.mkdirSync(dir);
-  // }
   var datatmp = '';
   data.forEach(file => {
     datatmp = ''
     file.properties.forEach(property => {
-       datatmp = datatmp + '# ' + property.comment + '\n';
+       datatmp = datatmp + '# ' + property.comment.trim() + '\n';
        datatmp = datatmp + property.prop + '=' + property.value + '\n\n';
     });
     if (process.platform === 'win32') fs.writeFileSync('..\\' + file.reqType + '\\' + file.filename, datatmp);
