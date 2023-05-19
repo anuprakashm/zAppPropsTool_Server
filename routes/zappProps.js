@@ -2,6 +2,8 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs')
 var zipper = require('zip-local');
+const propMap = require('../config_templates/property-map.json');
+const propMapKeys = Object.keys(propMap);
 
 /* get properties listing. */
 router.post('/getProps', function(req, res, next) {
@@ -16,8 +18,11 @@ router.post('/getProps', function(req, res, next) {
   var cics = '';
   var imsdc = '';
   var mq = '';
+  var debug = '';
+  var idz = '';
   var zunit = '';
   var transfer = '';
+  var hide_boolean = false;
 
   const response = [];
 
@@ -74,6 +79,12 @@ router.post('/getProps', function(req, res, next) {
     if (other.name == 'ZUnit') {
       zunit = other.completed; 
     }
+    if (other.name == 'IBM Debug') {
+      debug = other.completed; 
+    }
+    if (other.name == 'IDZ') {
+      idz = other.completed; 
+    }
     if (other.name == 'Transfer Files') {
       transfer = other.completed; 
     }
@@ -114,7 +125,21 @@ router.post('/getProps', function(req, res, next) {
             line_tmp = line_tmp + line;
             key = line_tmp.substr(0,line_tmp.search("="));
             value = line_tmp.substr(line_tmp.search("=")+1);
-            fileResp['properties'].push({'prop': key,'value' : value, 'comment' : comment});
+           
+            key_arr = [] 
+            propMapKeys.forEach(propMapKey => {
+              found = propMap[propMapKey].find(prop_key => prop_key.toUpperCase() == key)
+              if (found) {
+                key_arr.push(propMapKey)
+              }
+            });
+
+            hide_boolean = false;
+            key_arr.forEach(key_arr_sub => {
+              if (!eval(key_arr_sub)) {hide_boolean = true};
+            });
+
+            fileResp['properties'].push({'prop': key,'value' : value, 'comment' : comment, 'hidden' : hide_boolean});
             comment = '';
             line_tmp = '';
           }

@@ -1,0 +1,12 @@
+{ "assembler" : ["SASMMOD1","SCSQMACS"],
+  "cobol" : ["SIGYCOMP_V4","SIGYCOMP_V6","SDFHCOB","SCSQCOBC"],
+  "pli"   : ["IBMZPLI_V52","IBMZPLI_V51","SDFHPL1","SCSQPLIC"],
+  "rexx"  : ["SFANLMD"],
+  "db2"   : ["SDSNLOAD"],
+  "ims"   : ["SDFSMAC","SDFSRESL","REFERAL"],
+  "cics"  : ["SDFHMAC","SDFHLOAD","SDFHCOB","SDFHPL1"],
+  "mq"    : ["SCSQCOBC","SCSQPLIC","SCSQMACS","SCSQLOAD"],
+  "zunit" : ["SBZUSAMP"],
+  "debug" : ["SEQAMOD"],
+  "idz"   : ["SFELLOAD"]
+}
