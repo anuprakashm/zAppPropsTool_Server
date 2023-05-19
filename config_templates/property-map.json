@@ -1,4 +1,4 @@
-{ "assembler" : ["SASMMOD1","SCSQMACS"],
+{ "assembler" : ["SASMMOD1","SCSQMACS","SCEEMAC","MACLIB"],
   "cobol" : ["SIGYCOMP_V4","SIGYCOMP_V6","SDFHCOB","SCSQCOBC"],
   "pli"   : ["IBMZPLI_V52","IBMZPLI_V51","SDFHPL1","SCSQPLIC"],
   "rexx"  : ["SFANLMD"],
