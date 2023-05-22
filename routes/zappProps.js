@@ -110,6 +110,7 @@ router.post('/getProps', function(req, res, next) {
       if (!transfer && file.toUpperCase() == 'TRANSFER.PROPERTIES') { return }
 
       var fileResp = {'properties' : []}
+      var prop_idx = 0;
       propFile = propFileFolder + file
   
       const propFileContents = fs.readFileSync(propFile, 'utf-8');
@@ -139,7 +140,8 @@ router.post('/getProps', function(req, res, next) {
               if (!eval(key_arr_sub)) {hide_boolean = true};
             });
 
-            fileResp['properties'].push({'prop': key,'value' : value, 'comment' : comment, 'hidden' : hide_boolean});
+            fileResp['properties'].push({'idx': prop_idx, 'prop': key,'value' : value, 'comment' : comment, 'hidden' : hide_boolean});
+            prop_idx = prop_idx + 1;
             comment = '';
             line_tmp = '';
           }
