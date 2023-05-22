@@ -169,6 +169,97 @@ router.get('/resetProps', function(req, res, next) {
   res.status(200).send({'resp' : 'Reset Complete!!!'});
 });
 
+router.get('/allBuildProps', function(req, res, next) {
+
+  propFileFolder = '../build-conf/'
+  if (process.platform === 'win32') propFileFolder = propFileFolder.replaceAll('/','\\');
+
+  if (!fs.existsSync(propFileFolder)) {
+    copyFolders();
+  }
+
+  var comment = '';
+  var line_tmp = '';
+  var fileResp = []
+  
+  fs.readdir(propFileFolder, (err, files) => {
+    files.forEach(file => {
+      if (file.search(".properties") == -1) {
+        return;
+      }
+      
+      
+      propFile = propFileFolder + file
+  
+      const propFileContents = fs.readFileSync(propFile, 'utf-8');
+
+      propFileContents.split(/\r?\n/).forEach ( line =>  {
+          if (line.trimStart().substr(0,1) == '#') {
+            comment = comment + ' ' + line.trim().substr(1,line.trim().length);
+          } else if (line.trimEnd().substr(-1,1) == '\\') {
+            line_tmp = line_tmp + line.trim().substr(0,line.trim().length-1);
+          } else if (line.trim() == '') {
+            // Goto next line
+          } else {
+            line_tmp = line_tmp + line;
+            key = line_tmp.substr(0,line_tmp.search("="));
+            value = line_tmp.substr(line_tmp.search("=")+1);
+
+            fileResp.push({'prop': key,'value' : value, 'comment' : comment, 'reqType' : 'build-conf', 'filename' : file});
+            comment = '';
+            line_tmp = '';
+          }
+      }); 
+    });
+    res.status(200).send(fileResp);
+  });
+});
+
+router.get('/allAppProps', function(req, res, next) {
+
+  propFileFolder = '../application-conf/'
+  if (process.platform === 'win32') propFileFolder = propFileFolder.replaceAll('/','\\');
+
+  if (!fs.existsSync(propFileFolder)) {
+    copyFolders();
+  }
+
+  var comment = '';
+  var line_tmp = '';
+  var fileResp = [];
+  
+  fs.readdir(propFileFolder, (err, files) => {
+    files.forEach(file => {
+      if (file.search(".properties") == -1) {
+        return;
+      }
+      
+      propFile = propFileFolder + file
+  
+      const propFileContents = fs.readFileSync(propFile, 'utf-8');
+
+      propFileContents.split(/\r?\n/).forEach ( line =>  {
+          if (line.trimStart().substr(0,1) == '#') {
+            comment = comment + ' ' + line.trim().substr(1,line.trim().length);
+          } else if (line.trimEnd().substr(-1,1) == '\\') {
+            line_tmp = line_tmp + line.trim().substr(0,line.trim().length-1);
+          } else if (line.trim() == '') {
+            // Goto next line
+          } else {
+            line_tmp = line_tmp + line;
+            key = line_tmp.substr(0,line_tmp.search("="));
+            value = line_tmp.substr(line_tmp.search("=")+1);
+
+            fileResp.push({'prop': key,'value' : value, 'comment' : comment,'reqType' : 'application-conf', 'filename' : file});
+            comment = '';
+            line_tmp = '';
+          }
+      }); 
+    });
+    res.status(200).send(fileResp);
+  });
+});
+
 function copyFolders(){
   buildConfSrc = './config_templates/build-conf/';
   buildConfTgt = '../build-conf/';
@@ -200,5 +291,6 @@ function writeFiles(dir,data){
   });
 
 };
+
 
 module.exports = router;
